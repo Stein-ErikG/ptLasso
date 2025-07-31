@@ -602,7 +602,7 @@ predict.ptLassoMult = function(fit, xtest, type, call, type.measure = fit$call$t
     phatind=array(NA, c(nrow(xtest), k, 1))
     
     # preTraining predictions
-    offsetTest = (1-fit$alpha) * predict(fit$fitoverall, xtest, s=fit$fitoverall.lambda, gamma=fit$fitoverall.gamma, type="link")[, , 1]
+    offsetTest = (1-fit$alpha) * predict(fit$fitoverall, xtest, s=fit$fitoverall.lambda, gamma=fit$fitoverall.gamma, type="link")[, , 1, drop=FALSE]
 
     for(kk in 1:k){
         # Pretraining predictions
