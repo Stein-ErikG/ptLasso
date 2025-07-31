@@ -603,6 +603,9 @@ predict.ptLassoMult = function(fit, xtest, type, call, type.measure = fit$call$t
     
     # preTraining predictions
     offsetTest = (1-fit$alpha) * predict(fit$fitoverall, xtest, s=fit$fitoverall.lambda, gamma=fit$fitoverall.gamma, type="link")[, , 1, drop=FALSE]
+    if(is.vector(offsetTest)) {
+      offsetTest = matrix(offsetTest, nrow=1)
+    }
 
     for(kk in 1:k){
         # Pretraining predictions
