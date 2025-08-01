@@ -602,56 +602,21 @@ predict.ptLassoMult = function(fit, xtest, type, call, type.measure = fit$call$t
     phatind=array(NA, c(nrow(xtest), k, 1))
     
     # preTraining predictions
-    #offsetTest = (1-fit$alpha) * predict(fit$fitoverall, xtest, s=fit$fitoverall.lambda, gamma=fit$fitoverall.gamma, type="link")[, , 1, drop=FALSE]
-   # if(is.vector(offsetTest)) {
-  #    offsetTest = matrix(offsetTest, nrow=1)
- #   }
-#
-    #for(kk in 1:k){
-    #    # Pretraining predictions
-    #    phatpre[, kk, 1] = predict(fit$fitpre[[kk]], xtest, newoffset=offsetTest[, kk], type="link", s=s, gamma=gamma) 
-    #
-    #    # Individual model predictions
-    #    phatind[, kk, 1] = predict(fit$fitind[[kk]], xtest, type="link", s=s, gamma=gamma)  
-    #
-    #    if(!is.null(ytest)){
-    #        errpre[kk] = gaussian(ytest[, kk], phatpre[, kk, 1])
-    #        errind[kk] = gaussian(ytest[, kk], phatind[, kk, 1])
-    #    }
-    #}
-                                  # Fix here 
-    # preTraining predictions
-offsetTest = (1-fit$alpha) * predict(fit$fitoverall, xtest, s=fit$fitoverall.lambda, gamma=fit$fitoverall.gamma, type="link")[, , 1, drop=FALSE]
+    offsetTest = (1-fit$alpha) * predict(fit$fitoverall, xtest, s=fit$fitoverall.lambda, gamma=fit$fitoverall.gamma, type="link")[, , 1,drop=FALSE]
 
-# More robust handling for single observations
-if(nrow(xtest) == 1) {
-    # For single observation, ensure offsetTest is a proper 1 x k matrix
-    if(is.vector(offsetTest)) {
-        offsetTest = matrix(offsetTest, nrow=1, ncol=k)
-    } else if(length(dim(offsetTest)) == 2 && ncol(offsetTest) != k) {
-        # Handle case where dimensions got scrambled
-        offsetTest = matrix(as.vector(offsetTest), nrow=1, ncol=k)
-    }
-} else {
-    # For multiple observations
-    if(is.vector(offsetTest)) {
-        offsetTest = matrix(offsetTest, nrow=nrow(xtest), ncol=k, byrow=TRUE)
-    }
-}
+    for(kk in 1:k){
+        # Pretraining predictions
+        phatpre[, kk, 1] = predict(fit$fitpre[[kk]], xtest, newoffset=offsetTest[, kk,1], type="link", s=s, gamma=gamma) 
 
-for(kk in 1:k){
-    # Pretraining predictions
-    phatpre[, kk, 1] = predict(fit$fitpre[[kk]], xtest, newoffset=offsetTest[, kk], type="link", s=s, gamma=gamma) 
-    
-    # Individual model predictions
-    phatind[, kk, 1] = predict(fit$fitind[[kk]], xtest, type="link", s=s, gamma=gamma)  
-    
-    if(!is.null(ytest)){
-        errpre[kk] = gaussian(ytest[, kk], phatpre[, kk, 1])
-        errind[kk] = gaussian(ytest[, kk], phatind[, kk, 1])
+        # Individual model predictions
+        phatind[, kk, 1] = predict(fit$fitind[[kk]], xtest, type="link", s=s, gamma=gamma)  
+
+        if(!is.null(ytest)){
+            errpre[kk] = gaussian(ytest[, kk], phatpre[, kk, 1])
+            errind[kk] = gaussian(ytest[, kk], phatind[, kk, 1])
+        }
     }
-}
-                                  # To here
+    
     if(!is.null(ytest)){
         erroverall = c(erroverall,
                    mean( erroverall.classes),
